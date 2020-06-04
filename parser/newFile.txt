@@ -1,0 +1,24 @@
+id: 23, parent node: none, name: shape, child nodes:  0,  17,  22
+id: 0, parent node: 23, name: type, value: tetrahedron
+id: 17, parent node: 23, name: vertices, child nodes:  4,  8,  12,  16
+id: 4, parent node: 17, name: point, child nodes:  1,  2,  3
+id: 1, parent node: 4, name: x, value: 1
+id: 2, parent node: 4, name: y, value: 0
+id: 3, parent node: 4, name: z, value: 0
+id: 8, parent node: 17, name: point, child nodes:  5,  6,  7
+id: 5, parent node: 8, name: x, value: 0
+id: 6, parent node: 8, name: y, value: 1
+id: 7, parent node: 8, name: z, value: 0
+id: 12, parent node: 17, name: point, child nodes:  9,  10,  11
+id: 9, parent node: 12, name: x, value: 0
+id: 10, parent node: 12, name: y, value: 0
+id: 11, parent node: 12, name: z, value: 1
+id: 16, parent node: 17, name: point, child nodes:  13,  14,  15
+id: 13, parent node: 16, name: x, value: 1
+id: 14, parent node: 16, name: y, value: 1
+id: 15, parent node: 16, name: z, value: 1
+id: 22, parent node: 23, name: color, child nodes:  18,  19,  20,  21
+id: 18, parent node: 22, name: r, value: 0xFF
+id: 19, parent node: 22, name: g, value: 0x00
+id: 20, parent node: 22, name: b, value: 0x80
+id: 21, parent node: 22, name: alpha, value: 0x80
