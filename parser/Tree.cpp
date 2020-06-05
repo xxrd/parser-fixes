@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <iostream>
 
 using namespace std;
 
@@ -17,6 +18,68 @@ Tree::Node::Node(const std::string& name, list<Tree::Node*>* childNodes, const i
 	childNodes(childNodes), 
 	id(id) 
 {}
+
+Tree::Node::Node(const Node& node) {
+	if (node.childNodes != nullptr) {
+		list<Node*>* nodes = new list<Node*>();
+		for (list<Node*>::const_iterator it = node.childNodes->begin(); it != node.childNodes->end(); ++it)
+		{
+			nodes->push_back(new Node(**it));
+		}
+		id = node.id;
+		name = node.name;
+		value = node.value;
+		childNodes = nodes;
+
+	}
+	else {
+		id = node.id;
+		name = node.name;
+		value = node.value;
+		childNodes = nullptr;
+	}
+}
+
+void Tree::Node::swap(Node& node) {
+	std::swap(id, node.id);
+	std::swap(name, node.name);
+	std::swap(value, node.value);
+	childNodes = node.childNodes;
+	node.childNodes = nullptr;
+}
+
+Tree::Node::Node(Node&& node) {
+	swap(node);
+}
+
+Tree::Node& Tree::Node::operator=(Node&& node) {
+	swap(node);
+	return *this;
+}
+
+Tree::Node& Tree::Node::operator=(Node const& node) {
+	if (this != &node) { 
+		if (node.childNodes != nullptr) {
+			delete childNodes;
+			childNodes = new list<Node*>();
+			for (list<Node*>::const_iterator it = node.childNodes->begin(); it != node.childNodes->end(); ++it)
+			{
+				childNodes->push_back(new Node(**it));
+			}
+			id = node.id;
+			name = node.name;
+			value = node.value;
+
+		}
+		else {
+			id = node.id;
+			name = node.name;
+			value = node.value;
+			childNodes = nullptr;
+		}
+	}
+	return *this;
+}
 
 Tree::Node::~Node() {
 	if (childNodes != nullptr) {
@@ -78,6 +141,29 @@ void Tree::Node::output(std::ostream& os, int parentId) const {
 Tree::Tree(Node* n) : 
 	root(n) 
 {}
+
+Tree::Tree(const Tree& tree) {
+	root = new Node(*tree.root);
+}
+
+Tree& Tree::operator=(Tree const& tree) {
+	if (this != &tree) {
+		delete root;
+		root = new Node(*tree.root);
+	}
+	return *this;
+}
+
+Tree& Tree::operator=(Tree&& tree) {
+	root = tree.root;
+	tree.root = nullptr;
+	return *this;
+}
+
+Tree::Tree(Tree&& tree) {
+	root = tree.root;
+	tree.root = nullptr;
+}
 
 Tree::~Tree() {
 	delete root;

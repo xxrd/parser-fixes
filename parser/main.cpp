@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 		shared_ptr<Tree> tree(parser.parse());
 		
 		out << *tree;
-		
+
 		in.close();
 		out.close();
 	}

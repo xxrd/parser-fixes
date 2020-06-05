@@ -11,10 +11,15 @@ public:
 		std::string name;
 		std::string value;
 		std::list<Node*>* childNodes;
+		void swap(Node& s);
 
 	public:
 		Node(const std::string& name, const std::string& value, const int id);
 		Node(const std::string& name, std::list<Tree::Node*>* childNodes, const int id);
+		Node(const Tree::Node& node);
+		Node& operator=(Node const& s);
+		Tree::Node& operator=(Node&& node);
+		Node(Node&& s);
 		~Node();
 		const std::string& getName() const noexcept;
 		const std::string& getValue() const noexcept;
@@ -26,6 +31,10 @@ public:
 
 	};
 	explicit Tree(Node* n);
+	Tree(const Tree& tree);
+	Tree(Tree&& tree);
+	Tree& operator=(Tree const& s);
+	Tree& operator=(Tree&& tree);
 	~Tree();
 	static void output(std::ostream& os, Tree::Node* node, int parentId);
 	int size() const;
