@@ -2,33 +2,38 @@
 #include <string>
 #include <list>
 
-
 class Tree {
 public:
 	static class Node {
 	private:
 		int id;
+		Node* parent;
 		std::string name;
 		std::string value;
 		std::list<Node*>* childNodes;
+		Node(const std::string& name, const std::string& value, int id, Node* parent = nullptr);
+		Node(const std::string& name, int id, Node* parent = nullptr);
 		void swap(Node& s);
 
 	public:
-		Node(const std::string& name, const std::string& value, const int id);
-		Node(const std::string& name, std::list<Tree::Node*>* childNodes, const int id);
-		Node(const Tree::Node& node);
-		Node& operator=(Node const& s);
-		Tree::Node& operator=(Node&& node);
+		Node(const Node& node);
+		Node& operator=(const Node& s);
+		Node& operator=(Node&& node);
 		Node(Node&& s);
 		~Node();
 		const std::string& getName() const noexcept;
+		void setName(const std::string& name);
 		const std::string& getValue() const noexcept;
+		void setValue(const std::string& value);
 		int getId() const noexcept;
-		bool hasChildNodes() const noexcept;
+		Node* getParent() const;
+		void setParent(Node* parent);
 		std::list<Node*>* getChildNodes() const noexcept;
-		void addChildNode(Node* node);
-		void output(std::ostream& os, int parentId) const;
+		bool hasChildNodes() const noexcept;
+		void appendChild(Node* node);
+		bool isDummy() const;
 
+		friend Tree;
 	};
 	explicit Tree(Node* n);
 	Tree(const Tree& tree);
@@ -36,15 +41,20 @@ public:
 	Tree& operator=(Tree const& s);
 	Tree& operator=(Tree&& tree);
 	~Tree();
-	static void output(std::ostream& os, Tree::Node* node, int parentId);
-	int size() const;
-	void output(std::ostream& os) const;
 	Node* getRoot() const;
+	static void output(std::ostream& os, Tree::Node* node);
+	void output(std::ostream& os) const;
+	static int size(Node* node);
+	int size() const;
+	static Node* makeNode(const std::string& name, const std::string& value);
+	static Node* makeNode(const std::string& name);
+	static Node* makeDummy();
 
 private:
-	int* size(Node* node, int* counter) const;
 	Node* root;
+	static int generateNodeId();
 
 };
 
 std::ostream& operator<<(std::ostream& os, const Tree& tree);
+std::ostream& operator<<(std::ostream& os, const Tree::Node& node);

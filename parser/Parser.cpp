@@ -26,32 +26,34 @@ bool Parser::match(TokenType type) {
 Tree::Node* Parser::node() {
 	string name;
 	string value;
-	list<Tree::Node*>* const nodes = new list<Tree::Node*>();
-	static int id = 0;
 
 	if (size == 0)
-		return new Tree::Node("", "", id++);
+		return Tree::makeDummy();
 
-	const Token nameToken = get(0);
+	const Token nodeNameToken = get(0);
 
 	if (match(TokenType::NODE_NAME)) {
-		name = nameToken.getText();
+		name = nodeNameToken.getText();
+
 		if (match(TokenType::EQUAL)) {
-			const Token valueToken = get(0);
+			const Token nodeValueToken = get(0);
 
 			if (match(TokenType::NODE_VALUE)) {
-				value = valueToken.getText();
-				return new Tree::Node(name, value, id++);
+				value = nodeValueToken.getText();
+				return Tree::makeNode(name, value);
 			}
 			else if (match(TokenType::LBRACKET)) {
 				if (match(TokenType::RBRACKET)) 
 					throw ParsingError("List of nodes cannot be empty, position number "
 						+ to_string(pos) + " of the token array");
-			
+				
+				Tree::Node* currentNode = Tree::makeNode(name);
+
 				while (true) {
-					nodes->push_back(node());
+					currentNode->appendChild(node());
+
 					if (match(TokenType::RBRACKET)) {
-						return new Tree::Node(name, nodes, id++);
+						return currentNode;
 					}
 				}
 			}

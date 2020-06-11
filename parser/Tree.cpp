@@ -2,50 +2,66 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-#include <iostream>
 
 using namespace std;
 
-Tree::Node::Node(const std::string& name, const std::string& value, const int id) : 
+Tree::Node::Node(const std::string& name, const std::string& value, int id, Node* parent) :
+	id(id),
+	parent(parent),
 	name(name), 
 	value(value), 
-	id(id), 
-	childNodes(nullptr) 
+	childNodes(nullptr)
 {}
 
-Tree::Node::Node(const std::string& name, list<Tree::Node*>* childNodes, const int id) : 
-	name(name), 
-	childNodes(childNodes), 
-	id(id) 
+Tree::Node::Node(const std::string& name, int id, Node* parent) :
+	id(id),
+	parent(parent),
+	name(name),
+	childNodes(nullptr)
 {}
 
 Tree::Node::Node(const Node& node) {
+	id = node.id;
+	name = node.name;
+	value = node.value;
+	parent = nullptr;
+
 	if (node.childNodes != nullptr) {
-		list<Node*>* nodes = new list<Node*>();
+		childNodes = new list<Node*>();
 		for (list<Node*>::const_iterator it = node.childNodes->begin(); it != node.childNodes->end(); ++it)
 		{
-			nodes->push_back(new Node(**it));
+			Node* n = new Node(**it);
+			n->setParent(this);
+			childNodes->push_back(n);
 		}
-		id = node.id;
-		name = node.name;
-		value = node.value;
-		childNodes = nodes;
-
 	}
 	else {
-		id = node.id;
-		name = node.name;
-		value = node.value;
 		childNodes = nullptr;
 	}
 }
 
-void Tree::Node::swap(Node& node) {
-	std::swap(id, node.id);
-	std::swap(name, node.name);
-	std::swap(value, node.value);
-	childNodes = node.childNodes;
-	node.childNodes = nullptr;
+Tree::Node& Tree::Node::operator=(Node const& node) {
+	if (this != &node) {
+		id = node.id;
+		name = node.name;
+		value = node.value;
+		parent = nullptr;
+
+		if (node.childNodes != nullptr) {
+			delete childNodes;
+			childNodes = new list<Node*>();
+			for (list<Node*>::const_iterator it = node.childNodes->begin(); it != node.childNodes->end(); ++it)
+			{
+				Node* n = new Node(**it);
+				n->setParent(this);
+				childNodes->push_back(n);
+			}
+		}
+		else {
+			childNodes = nullptr;
+		}
+	}
+	return *this;
 }
 
 Tree::Node::Node(Node&& node) {
@@ -54,30 +70,6 @@ Tree::Node::Node(Node&& node) {
 
 Tree::Node& Tree::Node::operator=(Node&& node) {
 	swap(node);
-	return *this;
-}
-
-Tree::Node& Tree::Node::operator=(Node const& node) {
-	if (this != &node) { 
-		if (node.childNodes != nullptr) {
-			delete childNodes;
-			childNodes = new list<Node*>();
-			for (list<Node*>::const_iterator it = node.childNodes->begin(); it != node.childNodes->end(); ++it)
-			{
-				childNodes->push_back(new Node(**it));
-			}
-			id = node.id;
-			name = node.name;
-			value = node.value;
-
-		}
-		else {
-			id = node.id;
-			name = node.name;
-			value = node.value;
-			childNodes = nullptr;
-		}
-	}
 	return *this;
 }
 
@@ -91,9 +83,21 @@ Tree::Node::~Node() {
 	}
 	delete childNodes;
 }
+
+void Tree::Node::swap(Node& node) {
+	std::swap(id, node.id);
+	std::swap(name, node.name);
+	std::swap(value, node.value);
+	parent = node.parent;
+	node.parent = nullptr;
+	childNodes = node.childNodes;
+	node.childNodes = nullptr;
+}
+
 const std::string& Tree::Node::getName() const noexcept {
 	return name;
 }
+
 const std::string& Tree::Node::getValue() const noexcept {
 	return value;
 }
@@ -111,31 +115,31 @@ list<Tree::Node*>* Tree::Node::getChildNodes() const noexcept {
 	return childNodes;
 }
 
-void Tree::Node::addChildNode(Node* node) {
+void Tree::Node::appendChild(Node* node) {
 	if (!hasChildNodes()) childNodes = new list<Node*>();
+	node->setParent(this);
 	childNodes->push_back(node);
 }
 
-void Tree::Node::output(std::ostream& os, int parentId) const {
-	os << "id: " << getId() << ", parent node: ";
-	if (parentId == -1) os << "none";
-	else os << parentId;
-	os << ", name: " << getName();
+void Tree::Node::setName(const std::string& name) {
+	this->name = name;
+}
 
-	if (!hasChildNodes()) {
-		os << ", value: " << getValue() << endl;
-		return;
-	}
-	else {
-		os << ", child nodes: ";
-		list<Tree::Node*>::iterator it;
-		for (it = childNodes->begin(); it != childNodes->end();) {
-			os << " " << (*it)->getId();
-			if (++it != childNodes->end()) os << ", ";
-			else os << endl;
-		}
-	}
+void Tree::Node::setValue(const std::string& value) {
+	this->value = value;
+}
 
+bool Tree::Node::isDummy() const {
+	if (getId() == -1) return true;
+	return false;
+}
+
+void Tree::Node::setParent(Node* parent) {
+	this->parent = parent;
+}
+
+Tree::Node* Tree::Node::getParent() const {
+	return parent;
 }
 
 Tree::Tree(Node* n) : 
@@ -169,47 +173,93 @@ Tree::~Tree() {
 	delete root;
 }
 
-void Tree::output(std::ostream& os, Tree::Node* node, int parentId) {
+void Tree::output(std::ostream& os, Tree::Node* node) {
 	if (!node->hasChildNodes()) {
-		node->output(os, parentId);
+		os << *node;
 		return;
 	}
 	else {
-		node->output(os, parentId);
+		os << *node;
 		for (list<Tree::Node*>::iterator it = node->getChildNodes()->begin(); it != node->getChildNodes()->end(); it++) {
-			output(os, *it, node->getId());
-
+			output(os, *it);
 		}
 	}
-}
-
-int* Tree::size(Node* node, int* counter) const {
-	if (!node->hasChildNodes()) {
-		(*counter)++;
-		return counter;
-	}
-	else {
-		(*counter)++;
-		for (list<Tree::Node*>::iterator it = node->getChildNodes()->begin(); it != node->getChildNodes()->end(); it++) {
-			size(*it, counter);
-		}
-	}
-}
-
-int Tree::size() const {
-	int* counter = new int(0);
-	size(root, counter);
-	int counterValue = *counter;
-	delete counter;
-	return counterValue;
 }
 
 void Tree::output(std::ostream& os) const {
-	Tree::output(os, root, -1);
+	if (root->isDummy()) return;
+	Tree::output(os, root);
+}
+
+int Tree::size(Node* node) {
+	static int counter = 0;
+
+	if (!node->hasChildNodes()) {
+		return ++counter;
+	}
+	else {
+		++counter;
+		for (list<Tree::Node*>::iterator it = node->getChildNodes()->begin(); it != node->getChildNodes()->end(); it++) {
+			size(*it);
+		}
+	}
+	return counter;
+}
+
+int Tree::size() const {
+	if (root->isDummy()) return 0;
+	return size(root);
 }
 
 Tree::Node* Tree::getRoot() const {
 	return root;
+}
+
+Tree::Node* Tree::makeNode(const std::string& name, const std::string& value) {
+	return new Node(name, value, generateNodeId());
+}
+
+Tree::Node* Tree::makeNode(const std::string& name) {
+	return new Node(name, generateNodeId());
+}
+
+Tree::Node* Tree::makeDummy() {
+	return new Tree::Node("", "", -1);
+}
+
+int Tree::generateNodeId() {
+	static int lastGeneratedNodeId = 0;
+	return lastGeneratedNodeId++;
+}
+
+std::ostream& operator<<(std::ostream& os, const Tree::Node& node) {
+	os << "Id: " << node.getId();
+	os << ", parent node: ";
+
+	if (node.getParent() == nullptr)
+		os << "none";
+	else
+		os << node.getParent()->getId();
+
+	os << ", name: " << node.getName();
+
+	if (!node.hasChildNodes()) {
+		os << ", value: " << node.getValue() << ";" << endl;
+		return os;
+	}
+	else {
+		os << ", child nodes:";
+		list<Tree::Node*>::iterator it;
+		for (it = node.getChildNodes()->begin(); it != node.getChildNodes()->end();) {
+			os << " " << (*it)->getId();
+			if (++it != node.getChildNodes()->end())
+				os << ",";
+			else
+				os << ";" << endl;
+		}
+	}
+
+	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Tree& tree) {

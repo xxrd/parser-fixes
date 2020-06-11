@@ -21,34 +21,23 @@ int main(int argc, char *argv[]) {
 		in.open(argv[1]);
 		out.open(argv[2]);
 
-		const string inStr((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
-
-		Lexer lexer(inStr);
+		Lexer lexer(in);
 		vector<Token> tokens = lexer.tokenize();
 
 		Parser parser(tokens);
 		shared_ptr<Tree> tree(parser.parse());
-		
+
 		out << *tree;
 
-		in.close();
-		out.close();
 	}
 	catch (const LexicalAnalysisError& e) {
-		cout << "Invalid data format" << endl;
-		in.close();
-		out.close();
+		cout << "Invalid data format" << " (Lexer error: " << e.what() << ")" << endl;
 	}
 	catch (const ParsingError& e) {
-		cout << "Invalid data format" << endl;
-		in.close();
-		out.close();
+		cout << "Invalid data format" << " (Parser error: " << e.what() << ")" << endl;
 	}
 	catch (const exception& e) {
 		cerr << e.what() << endl;
-		in.close();
-		out.close();
 	}
-
 
 }

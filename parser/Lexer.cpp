@@ -4,21 +4,21 @@
 
 using namespace std;
 
-Lexer::Lexer(const std::string& input) : 
-	input(input), 
-	length(input.size()), 
-	pos(0) 
+Lexer::Lexer(std::ifstream& input) :
+	input(input),
+	pos(0)
 {}
 
-char Lexer::peek(int relativePosition) const {
-	const int position = pos + relativePosition;
-	if (position >= length) return '\0';
-	return input.at(position);
+char Lexer::peek() const {
+	if (input.eof()) return EOF;
+	return input.peek();
 }
 
 char Lexer::next() {
+	if (input.eof()) return EOF;
+	input.get();
 	pos++;
-	return peek(0);
+	return input.peek();
 }
 
 void Lexer::addToken(TokenType type) {
@@ -31,7 +31,7 @@ void Lexer::addToken(TokenType type, const std::string& text) {
 
 void Lexer::tokenizeName() {
 	string buffer;
-	char current = peek(0);
+	char current = peek();
 
 	while (true) {
 		if (!isalpha(current) && !isdigit(current) && (current != '_')) {
@@ -55,7 +55,7 @@ void Lexer::tokenizeValue() {
 		if (current == '\n') {
 			throw LexicalAnalysisError("Unexpected end of line at position " + to_string(pos) + " of input");
 		}
-		if (current == '\0') {
+		if (current == EOF) {
 			throw LexicalAnalysisError("Not found a closing symbol '\"'");
 		}
 		buffer.push_back(current);
@@ -82,10 +82,14 @@ void Lexer::tokenizeRBracket() {
 }
 
 vector<Token> Lexer::tokenize() {
-	while (pos < length) {
-		char current = peek(0);
-		if (isalpha(current) || current == '_')
+	char current = peek();
+
+	while (true) {
+		current = peek();
+
+		if (isalpha(current) || current == '_') {
 			tokenizeName();
+		}
 		else if (current == '=') {
 			tokenizeEqual();
 		}
@@ -100,6 +104,9 @@ vector<Token> Lexer::tokenize() {
 		}
 		else if (isspace(current)) {
 			next();
+		}
+		else if (current == EOF) {
+			break;
 		}
 		else {
 			throw LexicalAnalysisError("Unknown sybmol at position " + to_string(pos) + " of input");

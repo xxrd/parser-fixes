@@ -3,6 +3,7 @@
 #include <string>
 #include "TokenType.h"
 #include "Token.h"
+#include <fstream>
 
 class Lexer {
 private:
@@ -11,12 +12,11 @@ private:
 		TokenType::EQUAL, TokenType::LBRACKET,
 		TokenType::RBRACKET
 	};
-	const std::string input;
+	std::ifstream& input;
 	std::vector<Token> tokens;
 	int pos;
-	int length;
 
-	char peek(int relativePosition) const;
+	char peek() const;
 	char next();
 	void addToken(TokenType type);
 	void addToken(TokenType type, const std::string& text);
@@ -27,7 +27,7 @@ private:
 	void tokenizeRBracket();
 
 public:
-	explicit Lexer(const std::string& input);
+	explicit Lexer(std::ifstream& input);
 	std::vector<Token> tokenize();
 
 };
