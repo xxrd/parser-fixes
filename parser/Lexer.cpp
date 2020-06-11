@@ -82,10 +82,8 @@ void Lexer::tokenizeRBracket() {
 }
 
 vector<Token> Lexer::tokenize() {
-	char current = peek();
-
 	while (true) {
-		current = peek();
+		char current = peek();
 
 		if (isalpha(current) || current == '_') {
 			tokenizeName();
@@ -111,9 +109,8 @@ vector<Token> Lexer::tokenize() {
 		else {
 			throw LexicalAnalysisError("Unknown sybmol at position " + to_string(pos) + " of input");
 		}
-
 	}
-
 	return tokens;
+
 }
 
