@@ -48,7 +48,13 @@ Tree::Node& Tree::Node::operator=(Node const& node) {
 		parent = nullptr;
 
 		if (node.childNodes != nullptr) {
+			for (list<Node*>::const_iterator it = childNodes->begin(); it != childNodes->end(); ++it)
+			{
+				delete *it;
+			}
+			childNodes->clear();
 			delete childNodes;
+
 			childNodes = new list<Node*>();
 			for (list<Node*>::const_iterator it = node.childNodes->begin(); it != node.childNodes->end(); ++it)
 			{
