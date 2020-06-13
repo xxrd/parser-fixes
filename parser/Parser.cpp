@@ -10,7 +10,7 @@ Parser::Parser(const std::vector<Token>& tokens) :
 	pos(0) 
 {}
 
-Token Parser::get(int relativePosition) const {
+const Token& Parser::get(int relativePosition) const {
 	const int position = pos + relativePosition;
 	if (position >= size) return END_OF_FILE;
 	return tokens.at(position);
@@ -24,30 +24,25 @@ bool Parser::match(TokenType type) {
 }
 
 Tree::Node* Parser::node() {
-	string name;
-	string value;
-
 	if (size == 0)
 		return Tree::makeDummy();
 
-	const Token nodeNameToken = get(0);
+	const Token& nodeNameToken = get(0);
 
 	if (match(TokenType::NODE_NAME)) {
-		name = nodeNameToken.getText();
 
 		if (match(TokenType::EQUAL)) {
-			const Token nodeValueToken = get(0);
+			const Token& nodeValueToken = get(0);
 
 			if (match(TokenType::NODE_VALUE)) {
-				value = nodeValueToken.getText();
-				return Tree::makeNode(name, value);
+				return Tree::makeNode(nodeNameToken.getText(), nodeValueToken.getText());
 			}
 			else if (match(TokenType::LBRACKET)) {
 				if (match(TokenType::RBRACKET)) 
 					throw ParsingError("List of nodes cannot be empty, position number "
 						+ to_string(pos) + " of the token array");
 				
-				Tree::Node* currentNode = Tree::makeNode(name);
+				Tree::Node* currentNode = Tree::makeNode(nodeNameToken.getText());
 
 				while (true) {
 					currentNode->appendChild(node());

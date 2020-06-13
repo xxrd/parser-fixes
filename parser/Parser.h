@@ -11,7 +11,7 @@ private:
 	int pos;
 	int size;
 
-	Token get(int relativePosition) const;
+	const Token& get(int relativePosition) const;
 	bool match(TokenType type);
 	Tree::Node* node();
 

@@ -5,8 +5,7 @@
 using namespace std;
 
 Lexer::Lexer(std::ifstream& input) :
-	input(input),
-	pos(0)
+	input(input)
 {}
 
 char Lexer::peek() const {
@@ -17,8 +16,11 @@ char Lexer::peek() const {
 char Lexer::next() {
 	if (input.eof()) return EOF;
 	input.get();
-	pos++;
 	return input.peek();
+}
+
+long long Lexer::currentPosition() {
+	return input.tellg();
 }
 
 void Lexer::addToken(TokenType type) {
@@ -53,7 +55,7 @@ void Lexer::tokenizeValue() {
 			break;
 		}
 		if (current == '\n') {
-			throw LexicalAnalysisError("Unexpected end of line at position " + to_string(pos) + " of input");
+			throw LexicalAnalysisError("Unexpected end of line at position " + to_string(currentPosition()) + " of input");
 		}
 		if (current == EOF) {
 			throw LexicalAnalysisError("Not found a closing symbol '\"'");
@@ -107,7 +109,7 @@ const vector<Token>& Lexer::tokenize() {
 			break;
 		}
 		else {
-			throw LexicalAnalysisError("Unknown sybmol at position " + to_string(pos) + " of input");
+			throw LexicalAnalysisError("Unknown sybmol at position " + to_string(currentPosition()) + " of input");
 		}
 	}
 	return tokens;

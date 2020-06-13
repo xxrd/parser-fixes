@@ -14,10 +14,10 @@ private:
 	};
 	std::ifstream& input;
 	std::vector<Token> tokens;
-	int pos;
 
 	char peek() const;
 	char next();
+	long long currentPosition();
 	void addToken(TokenType type);
 	void addToken(TokenType type, const std::string& text);
 	void tokenizeName();

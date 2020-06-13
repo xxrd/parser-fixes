@@ -38,7 +38,7 @@ public:
 	explicit Tree(Node* n);
 	Tree(const Tree& tree);
 	Tree(Tree&& tree);
-	Tree& operator=(Tree const& s);
+	Tree& operator=(const Tree& s);
 	Tree& operator=(Tree&& tree);
 	~Tree();
 	Node* getRoot() const;
