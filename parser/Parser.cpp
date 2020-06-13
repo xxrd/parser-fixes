@@ -78,6 +78,7 @@ Tree::Node* Parser::node() {
 }
 
 Tree* Parser::parse() {
+	pos = 0;
 	Tree::Node* n = node();
 	if (pos < size) 
 		throw ParsingError("Excessive tokens found starting from position number "

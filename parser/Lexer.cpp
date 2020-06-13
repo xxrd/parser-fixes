@@ -81,7 +81,7 @@ void Lexer::tokenizeRBracket() {
 	next();
 }
 
-vector<Token> Lexer::tokenize() {
+const vector<Token>& Lexer::tokenize() {
 	while (true) {
 		char current = peek();
 

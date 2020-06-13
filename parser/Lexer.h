@@ -28,6 +28,6 @@ private:
 
 public:
 	explicit Lexer(std::ifstream& input);
-	std::vector<Token> tokenize();
+	const std::vector<Token>& tokenize();
 
 };

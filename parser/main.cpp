@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 		out.open(argv[2]);
 
 		Lexer lexer(in);
-		vector<Token> tokens = lexer.tokenize();
+		const vector<Token>& tokens = lexer.tokenize();
 
 		Parser parser(tokens);
 		shared_ptr<Tree> tree(parser.parse());

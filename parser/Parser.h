@@ -7,7 +7,7 @@
 class Parser {
 private:
 	const Token END_OF_FILE = Token(TokenType::END_OF_FILE, "");
-	std::vector<Token> tokens;
+	const std::vector<Token>& tokens;
 	int pos;
 	int size;
 
